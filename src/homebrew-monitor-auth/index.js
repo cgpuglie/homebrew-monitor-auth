@@ -46,13 +46,24 @@ app.get(
 )
 app.post(
 	'/', 
-	function authenticate ({body: { username = '', password = '' }}, res) {
+	function authenticate ({body: { username = '', password = '' }}, res, next) {
 		return username === BREW_MASTER
 		&& password === BREW_MASTER_PASS
 		? res.status(200).send()
-		: res.status(401).send()
+		: next({code: 401, err: new Error("Not Authorized")})
 	}
 )
+
+app.use(function notFound(req, res, next) {
+	return next({code: 404, err: new Error("Not Found")})
+})
+
+app.use(function error({code=500, err=new Error()}, req, res, next) {
+	return code >= 500
+		? console.log(`${!color ? name : chalk[color](name) } > `, err) // log error and stack trace above 500
+		: console.log(`${!color ? name : chalk[color](name) } > ${err.message}`) // log only message - cleaner
+	|| res.status(code).send({message: err.message})
+})
 
 const server = app.listen(SERVICE_PORT, SERVICE_BIND_IP, () => {
   const {address, port} = server.address();
