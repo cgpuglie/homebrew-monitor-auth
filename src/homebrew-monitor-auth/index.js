@@ -21,11 +21,14 @@ const {
 const {
 	name='service',
 	color,
+	morgan: {
+		format
+	}
 } = yaml.safeLoad(fs.readFileSync(path.join(__dirname, 'config.yml')))
 
 const app = express()
 
-app.use(morgan(`${ !color ? name : chalk[color](name)} > :method :status :url - :response-time ms`))
+app.use(morgan(`${ !color ? name : chalk[color](name)} > ${format}`))
 app.use(jsonParser())
 
 // set base root
@@ -46,8 +49,8 @@ app.post(
 	function authenticate ({body: { username = '', password = '' }}, res) {
 		return username === BREW_MASTER
 		&& password === BREW_MASTER_PASS
-		? res.send(200)
-		: res.send(401)
+		? res.status(200).send()
+		: res.status(401).send()
 	}
 )
 
