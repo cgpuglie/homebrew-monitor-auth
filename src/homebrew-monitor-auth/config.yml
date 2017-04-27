@@ -1,0 +1,4 @@
+name: auth
+color: green
+morgan:
+  format: ':method :status :response-time ms - :url'
