@@ -12,6 +12,7 @@ const {
 
 const app = express()
 
+app.use(morgan('tiny'))
 app.use(jsonParser())
 
 // set base root
