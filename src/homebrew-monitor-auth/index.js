@@ -6,33 +6,34 @@ const fs = require('fs')
 const path = require('path')
 const { json: jsonParser } = require('body-parser-json')
 
-// load ENV
-const {
-	SERVICE_BIND_IP='0.0.0.0',
-	SERVICE_PORT=8081,
-	SERVICE_ROOT='/',
-	SERVICE_COLOR=true,
-	
-	BREW_MASTER='admin',
-	BREW_MASTER_PASS='password'
-} = process.env
-
 // load service config
 const {
 	name='service',
-	color,
+	serviceColor=false,
+	serviceBindIp='0.0.0.0',
+	servicePort=8081,
+	serviceRoot=`/${name}`,
 	morgan: {
 		format
 	}
 } = yaml.safeLoad(fs.readFileSync(path.join(__dirname, 'config.yml')))
 
+// load ENV
+const {
+	SERVICE_BIND_IP=serviceBindIp,
+	SERVICE_PORT=servicePort,
+	SERVICE_ROOT = serviceRoot,
+	SERVICE_COLOR: color = serviceColor,
+	BREW_MASTER='admin',
+	BREW_MASTER_PASS='password'
+} = process.env
+
+const base = express()
 const app = express()
 
 app.use(morgan(`${ !color ? name : chalk[color](name)} > ${format}`))
 app.use(jsonParser())
 
-// set base root
-app.all(SERVICE_ROOT)
 // set health check route
 app.get(
 	'/health',
@@ -65,8 +66,11 @@ app.use(function error({code=500, err=new Error()}, req, res, next) {
 	|| res.status(code).send({message: err.message})
 })
 
-const server = app.listen(SERVICE_PORT, SERVICE_BIND_IP, () => {
+// set base route
+base.use(SERVICE_ROOT, app)
+
+const server = base.listen(SERVICE_PORT, SERVICE_BIND_IP, () => {
   const {address, port} = server.address();
 
-  console.log(`${!color ? name : chalk[color](name) } > listening at http://${address}:${port}`);
+  console.log(`${!color ? name : chalk[color](name) } > listening at http://${address}:${port}${SERVICE_ROOT}`);
 });

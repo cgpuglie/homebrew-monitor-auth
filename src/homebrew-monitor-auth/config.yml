@@ -1,4 +1,4 @@
 name: auth
-color: green
+serviceColor: green
 morgan:
   format: ':method :status :url - :response-time ms'
