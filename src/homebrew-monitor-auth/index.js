@@ -1,4 +1,5 @@
 const express = require('express');
+const morgan = require('morgan')
 const { json: jsonParser } = require('body-parser-json')
 
 const {
@@ -11,14 +12,14 @@ const {
 
 const app = express()
 
-app.use(jsonParser)
+app.use(jsonParser())
 
 // set base root
 app.all(AUTH_ROOT)
 // set health check route
 app.get(
 	'/',
-	function authenticate (req, res) {
+	function health (req, res) {
 		return res.send({
 			ok: true
 		})
