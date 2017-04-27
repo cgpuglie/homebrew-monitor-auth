@@ -3,9 +3,10 @@ const morgan = require('morgan')
 const { json: jsonParser } = require('body-parser-json')
 
 const {
-	AUTH_BIND_IP='0.0.0.0',
-	AUTH_PORT=8081,
-	AUTH_ROOT='/',
+	SERVICE_BIND_IP='0.0.0.0',
+	SERVICE_PORT=8081,
+	SERVICE_ROOT='/',
+	
 	BREW_MASTER='admin',
 	BREW_MASTER_PASS='password'
 } = process.env
@@ -16,7 +17,7 @@ app.use(morgan('tiny'))
 app.use(jsonParser())
 
 // set base root
-app.all(AUTH_ROOT)
+app.all(SERVICE_ROOT)
 // set health check route
 app.get(
 	'/',
@@ -36,7 +37,7 @@ app.post(
 	}
 )
 
-const server = app.listen(AUTH_PORT, AUTH_BIND_IP, () => {
+const server = app.listen(SERVICE_PORT, SERVICE_BIND_IP, () => {
   const {address, port} = server.address();
 
   console.log(`Homebrew-monitor-auth listening at http://${address}:${port}`);
