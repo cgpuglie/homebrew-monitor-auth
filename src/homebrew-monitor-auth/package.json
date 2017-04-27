@@ -1,0 +1,16 @@
+{
+  "name": "homebrew-monitor-auth",
+  "version": "0.1.0",
+  "description": "Authentication service for homebrew-monitor",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "AUTH_"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser-json": "^1.9.2",
+    "express": "^4.15.2"
+  }
+}
