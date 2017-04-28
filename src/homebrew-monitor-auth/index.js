@@ -1,11 +1,9 @@
 const express = require('express')
-const morgan = require('morgan')
-const chalk = require('chalk')
 const yaml = require('js-yaml')
 const fs = require('fs')
 const path = require('path')
-const { json: jsonParser } = require('body-parser-json')
-
+// TODO: Move this to an npm module
+const microservice = require('../express-microservice')
 // load service config
 const {
 	name='service',
@@ -20,57 +18,37 @@ const {
 
 // load ENV
 const {
-	SERVICE_BIND_IP=serviceBindIp,
-	SERVICE_PORT=servicePort,
-	SERVICE_ROOT = serviceRoot,
-	SERVICE_COLOR: color = serviceColor,
-	BREW_MASTER='admin',
-	BREW_MASTER_PASS='password'
+	SERVICE_BIND_IP:ip=serviceBindIp,
+	SERVICE_PORT:port=servicePort,
+	SERVICE_ROOT:root=serviceRoot,
+	SERVICE_COLOR:color=serviceColor,
+	BREW_MASTER:master='admin',
+	BREW_MASTER_PASS:pass='password'
 } = process.env
 
-const base = express()
 const app = express()
 
-app.use(morgan(`${ !color ? name : chalk[color](name)} > ${format}`))
-app.use(jsonParser())
-
-// set health check route
-app.get(
-	'/health',
-	function health (req, res) {
-		return res
-			.status(200)
-			.send({
-				ok: true
-			})
-	}
-)
+// provide authentication
+// TODO: use JWT
 app.post(
 	'/', 
 	function authenticate ({body: { username = '', password = '' }}, res, next) {
-		return username === BREW_MASTER
-		&& password === BREW_MASTER_PASS
+		return username === master
+		&& password === pass
 		? res.status(200).send()
 		: next({code: 401, err: new Error("Not Authorized")})
 	}
 )
 
-app.use(function notFound(req, res, next) {
-	return next({code: 404, err: new Error("Not Found")})
-})
-
-app.use(function error({code=500, err=new Error()}, req, res, next) {
-	return code >= 500
-		? console.log(`${!color ? name : chalk[color](name) } > `, err) // log error and stack trace above 500
-		: console.log(`${!color ? name : chalk[color](name) } > ${err.message}`) // log only message - cleaner
-	|| res.status(code).send({message: err.message})
-})
-
-// set base route
-base.use(SERVICE_ROOT, app)
-
-const server = base.listen(SERVICE_PORT, SERVICE_BIND_IP, () => {
-  const {address, port} = server.address();
-
-  console.log(`${!color ? name : chalk[color](name) } > listening at http://${address}:${port}${SERVICE_ROOT}`);
-});
+// start microservice
+microservice(
+	app,
+	{
+		name,
+		format,
+		ip,
+		port,
+		root,
+		color
+	}
+)
