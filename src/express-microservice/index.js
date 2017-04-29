@@ -46,9 +46,12 @@ module.exports = function microservice(app, {
   // set base route
   base.use(root, app)
   // start server
-  const server = base.listen(port, ip, () => {
-    const {address, port} = server.address();
+  return new Promise(function startServer(resolve) {
+    const server = base.listen(port, ip, () => {
+      const {address, port} = server.address()
 
-    console.log(`${!color ? name : chalk[color](name) } > listening at http://${address}:${port}${root}`);
-  });
+      console.log(`${!color ? name : chalk[color](name) } > listening at http://${address}:${port}${root}`)
+      return resolve(server, {name, format, ip, port, root, color})
+    })
+  })
 }

@@ -41,14 +41,8 @@ app.post(
 )
 
 // start microservice
-microservice(
-	app,
-	{
-		name,
-		format,
-		ip,
-		port,
-		root,
-		color
-	}
-)
+module.exports = {
+	service: microservice(app, { name, format, ip, port, root, color }),
+	config: { name, format, ip, port, root, color }
+}
+
