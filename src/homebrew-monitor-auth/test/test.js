@@ -16,16 +16,16 @@ const setProp = (name) =>
 // function wrapper to delay evaluation
 const getProp = (name) => state[name]
 
-describe('server', function server() {
-  it('Should start', function startServer() {    
+describe('Server', function server() {
+  it('should start', function startServer() {    
     service
     .should.eventually.not.equal(undefined)
   })
 })
 
-describe('/health', function describeHealth() {
+describe('Health', function describeHealth() {
   // test status code
-  it('Should return a 200 status code', function healthStatusCode () {
+  it('should return a 200 status code', function healthStatusCode () {
     return rp({
       uri: `${base}/health`,
       resolveWithFullResponse: true
@@ -36,8 +36,8 @@ describe('/health', function describeHealth() {
   })
 })
 
-describe('login', function describeLogin() {
-  it('Should return a json webtoken', function tokenCheck () {
+describe('Auth & jwt creation', function describeLogin() {
+  it('should return a jwt for the admin user', function login () {
     return rp({
       uri: `${base}/`,
       method: 'POST',
@@ -48,7 +48,21 @@ describe('login', function describeLogin() {
     .should.eventually.not.equal(undefined)
   })
 
-  it('Should validate a token', function tokenValidate () {
+  it('should return a 401 for an invalid user', function invalidLogin() {
+    return rp({
+      uri: `${base}/`,
+      method: 'POST',
+      json: {username, password},
+      resolveWithFullResponse: true
+    })
+    .then(res => res.statusCode)
+    .should.eventually.equal(401)
+  })
+
+})
+
+describe('Validation', function describeValidation() {
+  it('should validate a token', function tokenValidate () {
     return rp({
       uri: `${base}/verify`,
       method: 'POST',
