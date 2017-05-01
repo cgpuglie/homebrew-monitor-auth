@@ -36,9 +36,16 @@ module.exports = function microservice(app, {
     return next({code: 404, err: new Error("Not Found")})
   })
 
+  // format normal error objects with status code
+  app.use(function error(error, req, res, next) {
+    return error.code
+    ? next(error)
+    : next({code: 500, err: error})
+  })
+
   app.use(function error({code=500, err=new Error()}, req, res, next) {
     return code >= 500
-      ? console.log(`${!color ? name : chalk[color](name) } > `, err) // log error and stack trace above 500
+      ? console.log(`${!color ? name : chalk[color](name) } > ${err.message}`, err) // log error and stack trace above 500
       : console.log(`${!color ? name : chalk[color](name) } > ${err.message}`) // log only message - cleaner
     || res.status(code).send({message: err.message})
   })

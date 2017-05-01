@@ -2,6 +2,8 @@ const express = require('express')
 const yaml = require('js-yaml')
 const fs = require('fs')
 const path = require('path')
+const { json: jsonParser } = require('body-parser-json')
+
 // TODO: Move this to an npm module
 const microservice = require('../express-microservice')
 // load service config
@@ -28,11 +30,13 @@ const {
 
 const app = express()
 
+// use body parser
+app.use(jsonParser())
 // provide authentication
 // TODO: use JWT
 app.post(
 	'/', 
-	function authenticate ({body: { username = '', password = '' }}, res, next) {
+	function authenticate ({body: { username = '', password = '' } = {}}, res, next) {
 		return username === master
 		&& password === pass
 		? res.status(200).send()
@@ -43,6 +47,6 @@ app.post(
 // start microservice
 module.exports = {
 	service: microservice(app, { name, format, ip, port, root, color }),
-	config: { name, format, ip, port, root, color }
+	config: { name, format, ip, port, root, color, master, pass }
 }
 
