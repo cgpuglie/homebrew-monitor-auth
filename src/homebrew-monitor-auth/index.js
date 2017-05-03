@@ -1,12 +1,12 @@
 const express = require('express')
+const morgan = require('morgan')
+const chalk = require('chalk')
 const yaml = require('js-yaml')
 const fs = require('fs')
 const path = require('path')
 const jwt = require('jsonwebtoken')
 const { json: jsonParser } = require('body-parser-json')
 
-// TODO: Move this to an npm module
-const microservice = require('../express-microservice')
 // load service config
 const {
 	name='service',
@@ -35,12 +35,16 @@ const {
 	BREW_MASTER_PASS:pass='password'
 } = process.env
 
+// TODO: move this to module
+const { middleware, errorHandler } = require('../common')({name,color})
+const base = express()
 const app = express()
 
 // use body parser
 app.use(jsonParser())
-// provide authentication
-// TODO: use JWT
+app.use(morgan(`${ !color ? name : chalk[color](name)} > ${format}`))
+
+// provide authentication, uses only admin account currently
 app.post(
 	'/', 
 	function authenticate ({body: { username = '', password = '' } = {}}, res, next) {
@@ -56,6 +60,8 @@ app.post(
 	}
 )
 
+// decode session and return contents
+// validate that session is valid and unexpired
 app.post(
 	'/decode',
 	function decodeToken ({body: { token }}, res, next) {
@@ -71,9 +77,26 @@ app.post(
 	}
 )
 
+// use common middlewares
+app.use(middleware)
+// register error handler
+app.use(errorHandler)
+
+// set base route
+base.use(root, app)
+
 // start microservice
 module.exports = {
-	service: microservice(app, { name, format, ip, port, root, color }),
+	// export server for use in tests
+	service: new Promise(function startServer(resolve) {
+    const server = base.listen(port, ip, () => {
+      const {address, port} = server.address()
+
+      console.log(`${!color ? name : chalk[color](name) } > listening at http://${address}:${port}${root}`)
+      return resolve(server)
+    })
+  }),
+	// export parsed config for use in tests
 	config: { name, format, ip, port, root, color, master, pass, secret, lifetime }
 }
 

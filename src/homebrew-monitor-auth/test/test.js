@@ -22,6 +22,16 @@ describe('Server', function server() {
     service
     .should.eventually.not.equal(undefined)
   })
+
+  it('should respond with 404 errors', function notFound() {
+    return rp({
+      uri: `${base}/notARealApi`,
+      resolveWithFullResponse: true
+    })
+    .then(res => res.statusCode)
+    .catch(res => res.statusCode)
+    .should.eventually.equal(404)
+  })
 })
 
 describe('Health', function describeHealth() {
