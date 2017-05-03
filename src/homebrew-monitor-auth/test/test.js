@@ -1,8 +1,9 @@
 const should = require('should')
 const rp = require('request-promise')
+const jwt = require('jsonwebtoken')
 
 // start app server
-const { service, config: {port, root, master: username, pass: password} } = require('../index')
+const { service, config: {port, root, secret, master: username, pass: password} } = require('../index')
 const base = `http://localhost:${port}${root}`
 
 // state object enclosing properties to override test closures
@@ -31,6 +32,7 @@ describe('Health', function describeHealth() {
       resolveWithFullResponse: true
     })
     .then(res => res.statusCode)
+    .catch(res => res.statusCode)
     .should.eventually.equal(200)
     
   })
@@ -52,23 +54,58 @@ describe('Auth & jwt creation', function describeLogin() {
     return rp({
       uri: `${base}/`,
       method: 'POST',
-      json: {username, password},
+      json: {username: 'BlackBeard', password: 'ImABadPirate'},
       resolveWithFullResponse: true
     })
     .then(res => res.statusCode)
+    .catch(res => res.statusCode)
     .should.eventually.equal(401)
   })
 
 })
 
 describe('Validation', function describeValidation() {
-  it('should validate a token', function tokenValidate () {
+  it('should decode a valid token', function tokenValidate () {
     return rp({
-      uri: `${base}/verify`,
+      uri: `${base}/decode`,
       method: 'POST',
       json: { token: getProp('jwt') }
     })
-    .then(body => body.user)
+    .then(body => body.username)
     .should.eventually.equal(username)
+  })
+
+  it('should reject an invalid token', function tokenInvalidate() {
+    return rp({
+      uri: `${base}/decode`,
+      method: 'POST',
+      json: { 
+        token: jwt.sign({
+          username,
+          exp: (Math.floor(Date.now() / 1000) + (60 * 60 * 1000)) // not likely to expire
+        }, 'notTheRightSecret'), // use incorrect secret
+      },
+      resolveWithFullResponse: true
+    })
+    .then(res => res.statusCode)
+    .catch(res => res.statusCode)
+    .should.eventually.equal(401)
+  })
+
+  it('should reject an expired token', function tokenExpired() {
+    return rp({
+      uri: `${base}/decode`,
+      method: 'POST',
+      json: { 
+        token: jwt.sign({
+          username,
+          exp: (Math.floor(Date.now() / 1000) - (60 * 60 * 1000)) // long expired
+        }, secret),
+      },
+      resolveWithFullResponse: true
+    })
+    .then(res => res.statusCode)
+    .catch(res => res.statusCode)
+    .should.eventually.equal(403)
   })
 })
