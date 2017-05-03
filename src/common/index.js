@@ -4,8 +4,11 @@ const chalk = require('chalk')
 
 const middleware = express()
 
-module.exports = function common ({color, name}) {
-   middleware.use('/health', function health (req, res) {
+module.exports = function common ({color, name, environment}) {
+  // do we log?
+  const silent = environment
+
+  middleware.use('/health', function health (req, res) {
     return res
       .status(200)
       .send({
@@ -27,8 +30,8 @@ module.exports = function common ({color, name}) {
   // log errors as applicable
   function errorHandler({code=500, err=new Error()}, req, res, next) {
     return code >= 500
-      ? console.log(`${!color ? name : chalk[color](name) } > ${err.message}`, err) // log error and stack trace above 500
-      : console.log(`${!color ? name : chalk[color](name) } > ${err.message}`) // log only message - cleaner
+      ? !silent ? console.log(`${!color ? name : chalk[color](name) } > ${err.message}`, err) : false // log error and stack trace above 500
+      : !silent ? console.log(`${!color ? name : chalk[color](name) } > ${err.message}`): false // log only message - cleaner
     || res.status(code).send({message: err.message})
   }
 

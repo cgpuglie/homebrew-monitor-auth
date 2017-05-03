@@ -1,6 +1,8 @@
 const should = require('should')
 const rp = require('request-promise')
 const jwt = require('jsonwebtoken')
+// set the environment to 'Test' to silence logs
+process.env['NODE_ENV'] = 'Test'
 
 // start app server
 const { service, config: {port, root, secret, master: username, pass: password} } = require('../index')

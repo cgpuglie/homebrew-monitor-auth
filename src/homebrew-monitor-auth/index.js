@@ -10,6 +10,7 @@ const { json: jsonParser } = require('body-parser-json')
 // load service config
 const {
 	name='service',
+	serviceEnv='Test',
 	serviceColor=false,
 	serviceBindIp='0.0.0.0',
 	servicePort=8081,
@@ -23,6 +24,7 @@ const {
 
 // load ENV
 const {
+	SERVICE_ENV:environment=serviceEnv,
 	SERVICE_BIND_IP:ip=serviceBindIp,
 	SERVICE_PORT:port=servicePort,
 	SERVICE_ROOT:root=serviceRoot,
@@ -35,14 +37,19 @@ const {
 	BREW_MASTER_PASS:pass='password'
 } = process.env
 
+// Do we log?
+const silent = (environment === 'Test')
+
 // TODO: move this to module
-const { middleware, errorHandler } = require('../common')({name,color})
+const { middleware, errorHandler } = require('../common')({name,color,environment})
 const base = express()
 const app = express()
 
 // use body parser
 app.use(jsonParser())
-app.use(morgan(`${ !color ? name : chalk[color](name)} > ${format}`))
+
+// use morgan unless testing
+silent || app.use(morgan(`${ !color ? name : chalk[color](name)} > ${format}`))
 
 // provide authentication, uses only admin account currently
 app.post(
@@ -92,7 +99,7 @@ module.exports = {
     const server = base.listen(port, ip, () => {
       const {address, port} = server.address()
 
-      console.log(`${!color ? name : chalk[color](name) } > listening at http://${address}:${port}${root}`)
+      silent || console.log(`${!color ? name : chalk[color](name) } > listening at http://${address}:${port}${root}`)
       return resolve(server)
     })
   }),
