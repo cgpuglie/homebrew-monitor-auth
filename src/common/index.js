@@ -6,7 +6,7 @@ const middleware = express()
 
 module.exports = function common ({color, name, environment}) {
   // do we log?
-  const silent = environment
+  const silent = (environment === 'Test')
 
   middleware.use('/health', function health (req, res) {
     return res
