@@ -1,3 +1,3 @@
-# Homebrew Monitor
+# Homebrew Monitor - Authentication
 
-An IOT Microservice based homebrew monitoring project
+Authentication microservice for Homebrew Monitor
