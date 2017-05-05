@@ -1,0 +1,13 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/homebrew-monitor-auth
+    machine:
+      node:
+        version: 6.2.0
+    steps:
+      - checkout
+      - run: npm i
+      - run: npm test
+
+      
