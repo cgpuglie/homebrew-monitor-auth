@@ -41,7 +41,7 @@ const {
 const silent = (environment === 'Test')
 
 // TODO: move this to module
-const { middleware, errorHandler } = require('../common')({name,color,environment})
+const { middleware, errorHandler } = require('homebrew-monitor-common')({name,color,environment})
 const base = express()
 const app = express()
 
