@@ -16,11 +16,11 @@
     "homebrew-monitor-common": "git+git@github.com:cgpuglie/homebrew-monitor-common.git",
     "js-yaml": "^3.8.3",
     "jsonwebtoken": "^7.4.0",
-    "morgan": "^1.8.1",
-    "should": "^11.2.1"
+    "morgan": "^1.8.1"
   },
   "devDependencies": {
     "mocha": "^3.3.0",
+    "should": "^11.2.1",
     "request": "^2.81.0",
     "request-promise": "^4.2.0"
   }
