@@ -10,7 +10,7 @@ const { json: jsonParser } = require('body-parser-json')
 // load service config
 const {
 	name='service',
-	serviceEnv='Test',
+	serviceEnv='Production',
 	serviceColor=false,
 	serviceBindIp='0.0.0.0',
 	servicePort=8081,
