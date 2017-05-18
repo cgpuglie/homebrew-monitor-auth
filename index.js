@@ -24,8 +24,7 @@ const {
 } = yaml.safeLoad(fs.readFileSync(path.join(__dirname, 'config.yml')))
 
 // load ENV
-const {
-	SERVICE_ENV:environment=serviceEnv,
+const {	
 	SERVICE_BIND_IP:ip=serviceBindIp,
 	SERVICE_PORT:port=servicePort,
 	SERVICE_ROOT:root=serviceRoot,
@@ -33,6 +32,8 @@ const {
 	
 	SERVICE_SECRET:secret=serviceSecret,
 	TOKEN_LIFETIME_H:lifetime=tokenLifetimeH,
+	
+	NODE_ENV:environment=serviceEnv,
 	
 	BREW_MASTER:master='admin',
 	BREW_MASTER_PASS:pass='password'
