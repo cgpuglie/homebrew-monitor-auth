@@ -17,8 +17,23 @@ jobs:
             mv /tmp/docker/* /usr/bin
       - run: 
           name: Build Test Image
-          command: docker build -t codemeister/homebrew-monitor-auth -f ./Dockerfile.test .
+          command: docker build -t codemeister/homebrew-monitor-auth-test -f ./Dockerfile.test .
       - run:
           name: Run Test Image
-          command: docker run -it codemeister/homebrew-monitor-auth
+          command: docker run -it codemeister/homebrew-monitor-auth-test
+      - run:
+          name: Log into Docker Hub
+          command: docker login -u "${DOCKER_USERNAME}"" -p "${DOCKER_PASSWORD}"
+      - run:
+          name: Build Production Image
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "publish" ]; then
+              docker build -t codemeister/homebrew-monitor-auth -f ./Dockerfile.production .
+            fi
+      - run:
+          name: Publish Production Image
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "publish" ]; then
+              # docker push codemeister/homebrew-monitor-auth
+            fi
       
