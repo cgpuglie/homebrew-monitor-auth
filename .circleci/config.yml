@@ -1,6 +1,9 @@
 version: 2
 jobs:
   build:
+    only:
+      - master
+      - publish
     working_directory: /app/homebrew-monitor-auth
     docker:
       - image: node:6.2.0
