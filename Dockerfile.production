@@ -1,4 +1,4 @@
-FROM node:6.2.0
+FROM node:7.10.0
 
 RUN mkdir -p /usr/src/homebrew-monitor-auth
 WORKDIR /usr/src/homebrew-monitor-auth
