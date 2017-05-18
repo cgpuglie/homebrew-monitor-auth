@@ -37,6 +37,6 @@ jobs:
           name: Publish Production Image
           command: |
             if [ "${CIRCLE_BRANCH}" == "publish" ]; then
-              # docker push codemeister/homebrew-monitor-auth
+              docker push codemeister/homebrew-monitor-auth
             fi
       
