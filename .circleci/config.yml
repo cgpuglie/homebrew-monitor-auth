@@ -1,9 +1,10 @@
 version: 2
 jobs:
   build:
-    only:
-      - master
-      - publish
+    branches:
+      only:
+        - master
+        - publish
     working_directory: /app/homebrew-monitor-auth
     docker:
       - image: node:7.10.0
