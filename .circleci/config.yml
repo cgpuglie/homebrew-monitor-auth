@@ -46,7 +46,7 @@ jobs:
             currentVersion=$(cat package.json | jq -r ".version")
             exists=$(curl -s "https://registry.hub.docker.com/v2/repositories/${DOCKER_USERNAME}/${CIRCLE_PROJECT_REPONAME}/tags/" | jq ".results[].name == \"${currentVersion}\"")
             if [ "${CIRCLE_BRANCH}" == "publish" ] && [ "${exists}" == "false" ]; then
-              docker build -t "${DOCKER_USERNAME}/${CIRCLE_PROJECT_REPONAME}" -f ./Dockerfile.production .
+              docker build -t "${DOCKER_USERNAME}/${CIRCLE_PROJECT_REPONAME}:${currentVersion}" -f ./Dockerfile.production .
             else
               echo "Skipped, branch=${CIRCLE_BRANCH} version=${currentVersion}"
             fi
