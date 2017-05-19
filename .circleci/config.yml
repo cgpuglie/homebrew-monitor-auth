@@ -38,7 +38,7 @@ jobs:
             if [ "${CIRCLE_BRANCH}" == "publish" ] && [ "${exists}" == "false" ]; then
               docker login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}"
             else
-              echo "Skipped, branch=${CIRCLE_BRANCH} version=${currentVersion}"
+              echo "Skipped, branch=${CIRCLE_BRANCH} version=${currentVersion} exists=${exists}"
             fi
       - run:
           name: Build Production Image
@@ -48,7 +48,7 @@ jobs:
             if [ "${CIRCLE_BRANCH}" == "publish" ] && [ "${exists}" == "false" ]; then
               docker build -t "${DOCKER_USERNAME}/${CIRCLE_PROJECT_REPONAME}:${currentVersion}" -f ./Dockerfile.production .
             else
-              echo "Skipped, branch=${CIRCLE_BRANCH} version=${currentVersion}"
+              echo "Skipped, branch=${CIRCLE_BRANCH} version=${currentVersion} exists=${exists}"
             fi
       - deploy:
           name: Publish Production Image
@@ -58,6 +58,6 @@ jobs:
             if [ "${CIRCLE_BRANCH}" == "publish" ] && [ "${exists}" == "false" ]; then
               docker push "${DOCKER_USERNAME}/${CIRCLE_PROJECT_REPONAME}:${currentVersion}"
             else
-              echo "Skipped, branch=${CIRCLE_BRANCH} version=${currentVersion}"
+              echo "Skipped, branch=${CIRCLE_BRANCH} version=${currentVersion} exists=${exists}"
             fi
       
