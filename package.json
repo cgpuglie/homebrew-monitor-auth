@@ -1,6 +1,6 @@
 {
   "name": "homebrew-monitor-auth",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Authentication service for homebrew-monitor",
   "main": "index.js",
   "scripts": {
