@@ -28,38 +28,36 @@ jobs:
       - run:
           name: Install JQ
           command: |
-            if [ "${CIRCLE_BRANCH}" == "publish" ] && [ ! -z $CIRCLE_TAG ]; then
-              wget https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 -O /usr/bin/;
+              wget https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 -O /usr/bin/jq;
               chmod 755 /usr/bin/jq;
-            else
-              echo "Skipped, branch=${CIRCLE_BRANCH} tag=${CIRCLE_TAG}"
-            fi
+      - run:
+          name: Check current NPM version against Publshed version
+          command: |
+            currentVersion=$(cat package.json | jq ".version")
+            exists=$(curl -s "https://registry.hub.docker.com/v2/repositories/${DOCKER_USERNAME}/${CIRCLE_PROJECT_REPONAME}/tags/" | jq ".results[].name == \"${CIRCLE_TAG}\"")
+            echo "Exists=${exists} Version=${currentVersion}"
       - run:
           name: Log into Docker Hub
           command: |
-            if [ "${CIRCLE_BRANCH}" == "publish" ] && [ ! -z $CIRCLE_TAG ]; then
+            if [ "${CIRCLE_BRANCH}" == "publish" ] && [ "${exists}" == "false" ]; then
               docker login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}"
             else
-              echo "Skipped, branch=${CIRCLE_BRANCH} tag=${CIRCLE_TAG}"
+              echo "Skipped, branch=${CIRCLE_BRANCH} version=${currentVersion}"
             fi
       - run:
           name: Build Production Image
           command: |
-            if [ "${CIRCLE_BRANCH}" == "publish" ] && [ ! -z $CIRCLE_TAG ]; then
+            if [ "${CIRCLE_BRANCH}" == "publish" ] && [ "${exists}" == "false" ]; then
               docker build -t "${DOCKER_USERNAME}/${CIRCLE_PROJECT_REPONAME}" -f ./Dockerfile.production .
             else
-              echo "Skipped, branch=${CIRCLE_BRANCH} tag=${CIRCLE_TAG}"
+              echo "Skipped, branch=${CIRCLE_BRANCH} version=${currentVersion}"
             fi
       - deploy:
           name: Publish Production Image
           command: |
-            if [ "${CIRCLE_BRANCH}" == "publish" ] && [ ! -z $CIRCLE_TAG ]; then
-              # check newest version
-              exists=$(curl -s "https://registry.hub.docker.com/v2/repositories/${DOCKER_USERNAME}/${CIRCLE_PROJECT_REPONAME}/tags/" | jq ".results[].name == \"${CIRCLE_TAG}\"")
-              if [[ $exists -eq "false" ]]; then
-                docker push "${DOCKER_USERNAME}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_TAG}"
-              fi
+            if [ "${CIRCLE_BRANCH}" == "publish" ] && [ "${exists}" == "false" ]; then
+              docker push "${DOCKER_USERNAME}/${CIRCLE_PROJECT_REPONAME}:${currentVersion}"
             else
-              echo "Skipped, branch=${CIRCLE_BRANCH} tag=${currentTag}"
+              echo "Skipped, branch=${CIRCLE_BRANCH} version=${currentVersion}"
             fi
       
