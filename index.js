@@ -8,7 +8,6 @@ const jwt = require('jsonwebtoken')
 const { json: jsonParser } = require('body-parser-json')
 
 // load service config
-// adding a comment to demo CI/CD
 const {
 	name='service',
 	serviceEnv='Production',
