@@ -41,8 +41,13 @@ const {
 // Do we log?
 const silent = (environment === 'Test')
 
-// TODO: move this to module
-const { middleware, errorHandler } = require('homebrew-monitor-common')({name,color,environment})
+const { 
+	notFoundHandler,
+  errorForwardHandler,
+  errorHandler,
+  authHandler,
+  healthHandler 
+} = require('homebrew-monitor-common')({name,color,environment})
 const base = express()
 const app = express()
 
@@ -51,6 +56,8 @@ app.use(jsonParser())
 
 // use morgan unless testing
 silent || app.use(morgan(`${ !color ? name : chalk[color](name)} > ${format}`))
+
+app.use('/health', healthHandler)
 
 // provide authentication, uses only admin account currently
 app.post(
@@ -85,9 +92,9 @@ app.post(
 	}
 )
 
-// use common middlewares
-app.use(middleware)
-// register error handler
+// use common middlewares for error handling
+app.use(notFoundHandler)
+app.use(errorForwardHandler)
 app.use(errorHandler)
 
 // set base route

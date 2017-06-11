@@ -5,7 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha",
-    "start": "node index.js"
+    "start": "node index.js",
+    "docker-build-test": "docker build -t homebrew-monitor-auth-test -f Dockerfile.test .",
+    "docker-run-test": "docker run -it --rm homebrew-monitor-auth-test",
+    "docker-build": "docker build -t homebrew-monitor-auth -f Dockerfile.production .",
+    "docker-run": "docker run -it --rm homebrew-monitor-auth"
   },
   "author": "",
   "license": "ISC",
