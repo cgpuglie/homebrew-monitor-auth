@@ -14,7 +14,7 @@ $ npm run docker-run-test;
 
 The service runs alongside various other services. The deployment information is a part of [the parent repo](https://github.com/cgpuglie/homebrew-monitor).
 
-For development of dependencies like homebrew-monitor-common, you can mount dependencies as volumes as follows:
+For development of dependencies like homebrew-monitor-common, you can mount dependencies into volumes as follows:
 
 ```bash
 docker run \
@@ -45,4 +45,4 @@ Below is a list of configuration options.
 |secret         |SERVICE_SECRET     |'J50NW3bT0k3n'  |
 |lifetime       |TOKEN_LIFETIME_H   |1            |
 |master         |BREW_MASTER        |'admin'      |
-|BREW_MASTER_PASS|pass              |'password'   |
+|pass           |BREW_MASTER_PASS   |'password'   |
